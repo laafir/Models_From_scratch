@@ -132,3 +132,48 @@ class SVMC:
     linear_output = np.dot(X, self.w) - self.b
     return np.sign(linear_output)
 
+#Lasso Regression
+import numpy as np
+
+class LassoRegression:
+    
+    def __init__(self, no_of_iteration, learning_rate, lambda_parameter):
+        self.no_of_iteration = no_of_iteration
+        self.learning_rate = learning_rate
+        self.lambda_parameter = lambda_parameter
+
+    def fit(self, X, Y):
+        self.X = X
+        self.Y = Y
+
+        # rows and columns
+        self.m, self.n = X.shape
+
+        # initializing weights and bias
+        self.w = np.zeros(self.n)
+        self.b = 0
+
+        for _ in range(self.no_of_iteration):
+            self.update_weight()
+
+    def update_weight(self):
+        y_pred = self.predict(self.X)
+
+        dw = np.zeros(self.n)
+
+        for j in range(self.n):
+            error_term = np.sum(self.X[:, j] * (self.Y - y_pred))
+
+            if self.w[j] > 0:
+                dw[j] = (-2 / self.m) * (error_term + self.lambda_parameter)
+            else:
+                dw[j] = (-2 / self.m) * (error_term - self.lambda_parameter)
+
+        db = (-2 / self.m) * np.sum(self.Y - y_pred)
+
+        # gradient descent update
+        self.w = self.w - self.learning_rate * dw
+        self.b = self.b - self.learning_rate * db
+
+    def predict(self, X):
+        return X.dot(self.w) + self.b
